@@ -2,4 +2,4 @@ import scrapper
 
 scr = scrapper.scrapper()
 
-scr.getShowList()
+print(scr.get_show_list())

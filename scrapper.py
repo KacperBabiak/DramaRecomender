@@ -4,7 +4,7 @@ import pandas as pd
 
 class scrapper:
 
-    def getUserList(self,nickname):
+    def get_user_list(self,nickname):
         url = "https://mydramalist.com/dramalist/%s/completed" % (nickname)
 
         page = requests.get(url)
@@ -26,30 +26,51 @@ class scrapper:
         df['Rating'] = ratings
 
         return df
+    
+    def get_page_number(self):
+        url = "https://mydramalist.com/search?adv=titles&ty=68,77,83,86&so=relevance&page=1"
+        page = requests.get(url)
 
-    def getShowList(self):
+        soup = BeautifulSoup(page.content, "html.parser")
+        results = soup.find_all(class_="page-item last")
+       
+        for result in results:
+            link = result.find('a')['href']
+            return int(link.split('=')[-1])
+        
+    def get_show_data(link):
+        url = 'https://mydramalist.com%s' % link
+
+        df= pd.DataFrame(columns=['Name','Rating', 'Number_of_rates','Description', 'Director',
+                                  'Screenwriter','Genre','Tags','Episodes_number','Country'])
+        
+        page = requests.get(url)
+
+        soup = BeautifulSoup(page.content, "html.parser")
+        results = soup.find_all(class_="text-primary title")
+
+    def get_show_list(self):
 
         url = "https://mydramalist.com/search?adv=titles&ty=68,77,83,86&so=relevance&page=%s"
+        df= pd.DataFrame(columns=['Name','Link'])
 
-        for i in range(1,25):
+        number_of_pages = self.get_page_number()
+
+        for i in range(1,number_of_pages+1):
             page_url = url % (i)
-            print(page_url)
             page = requests.get(page_url)
 
             soup = BeautifulSoup(page.content, "html.parser")
-            results = soup.find_all("h6", class_="text-primary title")
-            results = results.find_all("a")
-            list_links=[]
+            results = soup.find_all(class_="text-primary title")
 
-            #for result in results:
-            #    link=result['a']
-            #    list_links.append(link)
+            
+            for r in results:
+                list_row = [r.find('a').text,r.find('a')['href']]
+                df.loc[len(df)] = list_row
 
-
-
-            df = pd.DataFrame({'links':results})
-            print(df)
-            return df
+        return df
+            
+        
 
 
 
