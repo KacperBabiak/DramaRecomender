@@ -2,4 +2,5 @@ import scrapper
 
 scr = scrapper.scrapper()
 
-print(scr.get_show_list())
+url= "/53505-the-untamed-special-edition"
+scr.get_show_data(url,'dupa')
