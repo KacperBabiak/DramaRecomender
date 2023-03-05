@@ -1,6 +1,12 @@
 import scrapper
+import recommender
+import pandas as pd
+import time
 
-scr = scrapper.scrapper()
+st = time.time()
+rec = recommender.recommender()
+rec.get_recommendations('The Untamed')
 
-url= "/53505-the-untamed-special-edition"
-scr.get_show_data(url,'dupa')
+et = time.time()
+elapsed_time = et - st
+print('Execution time:', elapsed_time, 'seconds')

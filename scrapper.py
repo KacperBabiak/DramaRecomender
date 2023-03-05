@@ -60,7 +60,11 @@ class scrapper:
     def get_description(self,data, soup):
         results = soup.find_all(class_="show-synopsis")
         for result in results:
-            data.update({'Description':result.find('span').text})
+            try:
+                data.update({'Description':result.find('span').text})
+            except:
+                data.update({'Description':''})
+                print('nie ma opisu')
         
         return data
     
@@ -82,7 +86,8 @@ class scrapper:
                 tag = span.find('a', class_= 'text-primary')
                 tags.append(tag.text)
 
-            
+        sep = ' '
+        tags = sep.join(tags)    
         data.update({'Tag' :tags})
         
         return data
@@ -103,16 +108,19 @@ class scrapper:
         data = self.get_tags(data,soup)
 
 
-        print(data)
+        return data
 
 
 
-    def get_show_list(self):
+    def get_show_list(self,**kwargs):
 
         url = "https://mydramalist.com/search?adv=titles&ty=68,77,83,86&so=relevance&page=%s"
         df= pd.DataFrame(columns=['Name','Link'])
 
-        number_of_pages = self.get_page_number()
+        if  'pages' in kwargs:
+            number_of_pages = kwargs['pages']
+        else:
+            number_of_pages = self.get_page_number()
 
         for i in range(1,number_of_pages+1):
             page_url = url % (i)
@@ -127,6 +135,21 @@ class scrapper:
                 df.loc[len(df)] = list_row
 
         return df
+    
+    def get_all_shows_data(self):
+        df = self.get_show_list()
+        df2=pd.DataFrame()
+
+        for index,row in df.iterrows():
+            dic = self.get_show_data(row['Link'],row['Name'])
+            df_dict = pd.DataFrame.from_dict([dic])
+
+            df2 = pd.concat([df2,df_dict])
+            
+            
+
+        return df2
+
             
         
 
