@@ -3,16 +3,35 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 from sklearn.metrics.pairwise import linear_kernel
 import scrapper
+import getpass
+import mysql.connector
+import pandas as pd
+from mysql.connector import errorcode
+from sqlalchemy import create_engine
+import pymysql
 
 class recommender:
 
     def __init__(self):
-        self.get_data()
+        #self.get_data()
+        #self.recommend_prepare()
+        pass
 
-    def get_data(self):
+    def insert_data_to_sql(self,user,password):
         scr = scrapper.scrapper()
+        self.data = scr.get_all_shows_data()
 
-        self.data = scr.get_show_list()
+        host = 'sql7.freemysqlhosting.net'
+        database = 'sql7604015'
+
+        engine = create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}"
+                       .format(user=user,
+                               pw=password,
+                               host = host,
+                               db=database))
+
+        self.data.to_sql('Shows data', con = engine, if_exists = 'replace', chunksize = 1000)
+                
 
     # Function that computes the weighted rating of each movie
     def weighted_rating(self, df, m, C):
@@ -65,6 +84,7 @@ class recommender:
         movie_indices = [i[0] for i in sim_scores]
 
         # Return the top 10 most similar movies
+        print('dupa')
         print(self.data['Title'].iloc[movie_indices])
         return self.data['Title'].iloc[movie_indices]
 
