@@ -1,6 +1,8 @@
 from ast import literal_eval
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics.pairwise import linear_kernel
 import scrapper
 import getpass
@@ -13,14 +15,20 @@ import pymysql
 class recommender:
 
     def __init__(self):
-        #self.get_data()
-        #self.recommend_prepare()
+        self.get_data()
+        #print(self.data)
+        self.recommend_prepare()
         pass
 
-    def insert_data_to_sql(self,user,password):
+    def get_data(self):
+        self.data = pd.read_csv('shows_data.csv')
+
+    def data_to_csv(self):
         scr = scrapper.scrapper()
         self.data = scr.get_all_shows_data()
+        self.data.to_csv('shows_data.csv',index=False)
 
+    def insert_data_to_sql(self,user,password):
         host = 'sql7.freemysqlhosting.net'
         database = 'sql7604015'
 
@@ -29,41 +37,52 @@ class recommender:
                                pw=password,
                                host = host,
                                db=database))
-
+        print('connected')
         self.data.to_sql('Shows data', con = engine, if_exists = 'replace', chunksize = 1000)
+        
+
+        print('end')
                 
+    
 
-    # Function that computes the weighted rating of each movie
-    def weighted_rating(self, df, m, C):
-        v = df['Score']
-        R = df['Number_of_rates']
-        # Calculation based on the IMDB formula
-        return (v/(v+m) * R) + (m/(m+v) * C)
-
+    def clean_data(self, x ):
+        if isinstance(x, list):
+            return [str.lower(i.replace(" ", "")) for i in x]
+        else:
+            if isinstance(x, str):
+                return str.lower(x.replace(" ", ""))
+            else:
+                return ''
 
     def recommend_prepare(self):
-        # Calculate mean of vote average column
-        C = self.data['Score'].mean()
-        print(C)
+    
+        # Apply clean_data function to your features.
+        features = ['Screenwriter', 'Director']
 
-        # Calculate the minimum number of votes required to be in the chart, m
-        m = self.data['Number_of_rates'].quantile(0.65)
-        print(m)
-
-        #czy wprowadzic filtracje tych z małą ilością głosów?
-
-        # Define a new feature 'weighted_rating' and calculate its value with `weighted_rating()`
-        self.data['weighted_rating'] = self.data.apply(self.weighted_rating(self,self.data,m,C), axis=1)
-
+        for feature in features:
+            self.data[feature] = self.data[feature].apply(self.clean_data)
+        
+        
         #Define a TF-IDF Vectorizer Object. Remove all english stop words such as 'the', 'a'
-        tfidf = TfidfVectorizer(stop_words='english')
-
+        #tfidf = TfidfVectorizer(stop_words='english')
+        
+        
         #Construct the required TF-IDF matrix by fitting and transforming the data
-        tfidf_matrix = tfidf.fit_transform(self.data['Description'])
+        self.data = self.data.fillna('')
+        df_all = self.data['Director']  + self.data['Tag'] +self.data['Description'] + self.data['Genres']  + self.data['Country']  + self.data['Screenwriter']
+        
+        count = CountVectorizer(stop_words='english')
+        count_matrix = count.fit_transform(df_all)
+        #tfidf_matrix = tfidf.fit_transform(df_all)
+        
         # Compute the cosine similarity matrix
-        self.cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+        #self.cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+        self.cosine_sim = cosine_similarity(count_matrix, count_matrix)
+        
         #Construct a reverse map of indices and movie titles
-        self.indices = pd.Series(self.data.index, index=self.data['Title']).drop_duplicates()
+        
+        self.indices = pd.Series(self.data.index, index=self.data['Name']).drop_duplicates()
+        
 
 
     # Function that takes in movie title as input and outputs most similar movies
@@ -84,9 +103,9 @@ class recommender:
         movie_indices = [i[0] for i in sim_scores]
 
         # Return the top 10 most similar movies
-        print('dupa')
-        print(self.data['Title'].iloc[movie_indices])
-        return self.data['Title'].iloc[movie_indices]
+        
+        print(self.data['Name'].iloc[movie_indices])
+        return self.data['Name'].iloc[movie_indices]
 
 
 
