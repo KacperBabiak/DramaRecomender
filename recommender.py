@@ -15,6 +15,7 @@ import pymysql
 class recommender:
 
     def __init__(self):
+        self.scr = scrapper.scrapper()
         self.get_data()
         #print(self.data)
         self.recommend_prepare()
@@ -24,8 +25,8 @@ class recommender:
         self.data = pd.read_csv('shows_data.csv')
 
     def data_to_csv(self):
-        scr = scrapper.scrapper()
-        self.data = scr.get_all_shows_data()
+        
+        self.data = self.scr.get_all_shows_data()
         self.data.to_csv('shows_data.csv',index=False)
 
     def insert_data_to_sql(self,user,password):
@@ -97,15 +98,39 @@ class recommender:
         sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
 
         # Get the scores of the 10 most similar movies
-        sim_scores = sim_scores[1:11]
+        sim_scores = sim_scores[1:101]
 
         # Get the movie indices
         movie_indices = [i[0] for i in sim_scores]
 
         # Return the top 10 most similar movies
         
-        print(self.data['Name'].iloc[movie_indices])
+        #print(self.data['Name'].iloc[movie_indices])
         return self.data['Name'].iloc[movie_indices]
+    
+
+    def get_recommendations_on_list(self,df):
+        
+        scores_dic = {}
+
+        for index,row in df.iterrows():
+            recomm = self.get_recommendations(row['Title'])
+
+            for show in recomm:
+                if show in scores_dic:
+                    
+                    #print(row['Rating'])
+                    scores_dic[show]=scores_dic[show]+row['Rating']
+                else:
+                    scores_dic[show]=row['Rating']
+
+        sorted_dic = dict(sorted(scores_dic.items(), key=lambda item: item[1], reverse= True))
+        print(sorted_dic)
+
+    def get_recommendations_for_user(self,user):
+        user_list = self.scr.get_user_list(user)
+
+        return self.get_recommendations_on_list(user_list)
 
 
 

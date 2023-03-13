@@ -22,9 +22,12 @@ class scrapper:
 
         df = pd.DataFrame({'Title':list_names})
 
-
+        list_ratings=[]
         ratings = results.find_all("span", class_="score")
-        df['Rating'] = ratings
+        for rating in ratings:
+            list_ratings.append(float(rating.text))
+
+        df['Rating'] = list_ratings
 
         return df
     
