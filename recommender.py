@@ -114,15 +114,17 @@ class recommender:
         scores_dic = {}
 
         for index,row in df.iterrows():
-            recomm = self.get_recommendations(row['Title'])
+            if(row['Title'] in self.indices):
+                recomm = self.get_recommendations(row['Title'])
 
-            for show in recomm:
-                if show in scores_dic:
-                    
-                    #print(row['Rating'])
-                    scores_dic[show]=scores_dic[show]+row['Rating']
-                else:
-                    scores_dic[show]=row['Rating']
+                for show in recomm:
+                    if show in scores_dic:
+                        
+                        #print(row['Rating'])
+                        scores_dic[show]=scores_dic[show]+row['Rating']
+                    else:
+                        scores_dic[show]=row['Rating']
+            else: print("ni ma " + row['Title'])
 
         sorted_dic = dict(sorted(scores_dic.items(), key=lambda item: item[1], reverse= True))
         print(sorted_dic)

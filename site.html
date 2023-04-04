@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+ <meta charset="utf-8" />
+ <title>Drama recommender</title>
+
+
+<link rel="stylesheet" type="text/css" href="site.css" title="Arkusz stylów CSS">
+</head>
+<body>
+
+<div class="sections">
+    <h1> Wklej link do konta na myDramaList</h1>
+    <input id = "search" name="pole" placeholder="Szukaj!" novalidate>
+    <H3> Poniżej wyświetlą się podobne oraz rekomendowane seriale. Wyniki mogą być zmienione poprzez wybrane opcje</H3>
+</div>
+
+<div class="sections">
+    <h2> Wybierz opcje</h2>
+    <form id="Form_id">
+        
+        <div class="row">
+            <label for="country"> Country</label>
+            <select name="Country" id="country" >
+                <option value="All">All</option>
+                <option value="South Korea">South Korea</option>
+                <option value="China">China</option>
+                <option value="Japan">Japan</option>
+              </select>
+              <br>
+              
+              <label for="genre"> Genre</label>
+              <select name="Genre" id="genre" >
+                <option value="All">All</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Drama">Drama</option>
+                <option value="Horror">Horror</option>
+              </select>
+              <br>    
+        </div>
+
+        
+
+
+        <div class="row">
+            <label for="tags"> Tags</label>
+            <select name="Tags" id="tags" multiple>
+                <option value="None special">None special</option>
+                <option value="bl">bl</option>
+                <option value="CRIME">CRIME</option>
+                <option value="drama">drama</option>
+              </select>
+        
+        </div>
+        
+        
+
+          
+          <br>
+
+          <input type="submit" value="Szukaj rekomendacji">
+    </form >
+</div>
+
+<div class="sections">
+    <h2> tutaj podobne i rekomendacja</h2>
+
+
+    <ul>
+        <li>Coffee</li>
+        <li>Tea</li>
+        <li>Milk</li>
+      </ul>
+</div>
+
+
+
+
+
+
+
+
+</body>
+</html>

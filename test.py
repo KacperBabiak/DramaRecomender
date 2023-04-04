@@ -6,7 +6,7 @@ import time
 st = time.time()
 
 rec = recommender.recommender()
-rec.get_recommendations_for_user('10105451')
+rec.get_recommendations_for_user('MellOut')
 try:
     print('dupa')
     
