@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 
-class scrapper:
+class Scrapper:
 
     def get_user_list(self,nickname):
         url = "https://mydramalist.com/dramalist/%s/completed" % (nickname)
@@ -20,7 +20,7 @@ class scrapper:
             name=name['title']
             list_names.append(name)
 
-        df = pd.DataFrame({'Title':list_names})
+        df = pd.DataFrame({'Name':list_names})
 
         list_ratings=[]
         ratings = results.find_all("span", class_="score")
@@ -67,7 +67,7 @@ class scrapper:
                 data.update({'Description':result.find('span').text})
             except:
                 data.update({'Description':''})
-                print('nie ma opisu')
+                
         
         return data
     
@@ -95,11 +95,28 @@ class scrapper:
         
         return data
     
-    
+    def get_similiar(self,data,soup):
+        similiar=[]
+        results = soup.find_all(class_="list-item p-a-0 m-b-sm related-content")
+        
+        for result in results:
+            titles = result.find_all('div')
+            
+            for title in titles:
+                sim = title.find('a')
+                similiar.append(sim.text)
+
+        sep = ';'
+        similiar = sep.join(similiar)    
+        data.update({'Similiar' :similiar})
+        
+        return data
+
 
         
     def get_show_data(self,link,name):
         url = 'https://mydramalist.com%s' % link
+        
         page = requests.get(url)
         soup = BeautifulSoup(page.content, "html.parser")
         
@@ -109,7 +126,7 @@ class scrapper:
         data = self.get_description(data,soup)
         data = self.get_genres(data,soup)
         data = self.get_tags(data,soup)
-
+        data = self.get_similiar(data,soup)
 
         return data
 
@@ -141,17 +158,19 @@ class scrapper:
     
     def get_all_shows_data(self):
         df = self.get_show_list()
-        df2=pd.DataFrame()
+        df2 = pd.DataFrame()
 
         for index,row in df.iterrows():
             dic = self.get_show_data(row['Link'],row['Name'])
             df_dict = pd.DataFrame.from_dict([dic])
-
+            
             df2 = pd.concat([df2,df_dict])
             
-            
-
-        return df2
+        df.reset_index(inplace=True, drop=True)   
+        df2.reset_index(inplace=True, drop=True)  
+        df = pd.concat([df,df2],axis=1)
+        print(df)
+        return df
 
             
         

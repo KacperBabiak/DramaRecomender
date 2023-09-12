@@ -3,10 +3,18 @@ import recommender
 import pandas as pd
 import time
 
-st = time.time()
+#scr= scrapper.Scrapper()
+#df = scr.get_all_shows_data()
+#df.to_csv('all_shows_data.csv')
+#df = pd.read_csv('all_shows_data.csv')
+#print(df)
 
-rec = recommender.recommender()
-rec.get_recommendations_for_user('MellOut')
+#st = time.time()
+
+rec = recommender.Recommender()
+#print(rec.get_recommendations('Goblin',10))
+df = rec.get_recommendations_for_user('MellOut',150)
+'''
 try:
     print('dupa')
     
@@ -18,3 +26,4 @@ finally:
     et = time.time()
     elapsed_time = et - st
     print('Execution time:', elapsed_time, 'seconds')
+'''
