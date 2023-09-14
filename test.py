@@ -2,6 +2,7 @@ import scrapper
 import recommender
 import pandas as pd
 import time
+import recommender_colab
 
 #scr= scrapper.Scrapper()
 #df = scr.get_all_shows_data()
@@ -9,16 +10,17 @@ import time
 #df = pd.read_csv('all_shows_data.csv')
 #print(df)
 
-#st = time.time()
-
-rec = recommender.Recommender()
 #print(rec.get_recommendations('Goblin',10))
-df = rec.get_recommendations_for_user('MellOut',150)
-'''
+#df = rec.get_recommendations_for_user('MellOut',150)
+
+st = time.time()
+
+
 try:
     print('dupa')
-    
-    #rec.insert_data('sql7604015','cuCZhBqBCY')
+    rec = recommender_colab.Recommmender_Colab()
+    rec.model_fit()
+   
 except Exception as e: 
     print(e)
     print("cos nie pykło")
@@ -26,4 +28,3 @@ finally:
     et = time.time()
     elapsed_time = et - st
     print('Execution time:', elapsed_time, 'seconds')
-'''

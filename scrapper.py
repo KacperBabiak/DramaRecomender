@@ -13,6 +13,7 @@ class Scrapper:
         soup = BeautifulSoup(page.content, "html.parser")
         results = soup.find(id="content_2")
 
+        
         list_names=[]
         names = results.find_all("a", class_="title")
 

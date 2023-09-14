@@ -59,7 +59,7 @@ class Recommender:
         self.scr = scrapper.Scrapper()
         self.get_data()
         self.recommend_prepare()
-        pass
+        
 
     def get_data(self):
         self.data = pd.read_csv('all_shows_data.csv')
