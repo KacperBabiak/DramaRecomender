@@ -100,9 +100,7 @@ class Recommender:
 
         #Construct a reverse map of indices and movie titles
         self.indices = pd.Series(self.data.index, index=self.data['Name']).drop_duplicates()
-        
-
-        
+          
         
     def get_recommendations(self,title,n):
 
@@ -130,8 +128,6 @@ class Recommender:
         similar_df = similar_df[similar_df['index']!=index].sort_values(by='sim',ascending=False)
         
         return similar_df[['Name','sim']].head(n)
-
-    
 
 
     def get_similiar(self,title):
@@ -216,7 +212,6 @@ class Recommender:
         result = result[~result['Name'].isin(related)]
 
         copy = self.data.copy().drop(['Link','Number_of_rates','Tag','Similiar','Director','Screenwriter'],axis=1)
-        #result = pd.concat([result,copy],axis=1,join='inner')
         result = result.merge(copy,on='Name')
 
         result.sort_values(inplace=True,by='sim',ascending=False)
